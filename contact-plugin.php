@@ -35,6 +35,7 @@ if ( ! class_exists( 'ContactPlugin' ) ) {
 		public function initialize(): void {
 			require_once MY_PLUGIN_PATH . '/includes/utils.php';
 			require_once MY_PLUGIN_PATH . '/includes/options-page.php';
+			require_once MY_PLUGIN_PATH . '/includes/contact-form.php';
 		}
 	}
 	$contact_plugin = new ContactPlugin();
