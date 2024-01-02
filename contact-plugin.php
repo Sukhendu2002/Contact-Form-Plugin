@@ -28,6 +28,15 @@ if ( ! class_exists( 'ContactPlugin' ) ) {
 			define( 'MY_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 			require_once MY_PLUGIN_PATH . '/vendor/autoload.php';
 		}
+
+		/**
+		 * Initialize the plugin
+		 */
+		public function initialize() {
+			require_once MY_PLUGIN_PATH . '/includes/utils.php';
+			require_once MY_PLUGIN_PATH . '/includes/options-page.php';
+		}
 	}
-	new ContactPlugin();
+	$contact_plugin = new ContactPlugin();
+	$contact_plugin->initialize();
 }
