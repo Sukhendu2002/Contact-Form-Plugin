@@ -6,7 +6,8 @@
  */
 
 ?>
-<form>
+<form id="enquiry_form" method="post">
+	<?php wp_nonce_field( 'enquiry_form', 'enquiry_form_nonce' ); ?>
 	<div class="form-group">
 		<label for="name">Name</label>
 		<input type="text" name="name" id="name" />
@@ -26,5 +27,6 @@
 		<label for="message">Message</label>
 		<textarea name="message" id="message"></textarea>
 	</div>
+
 	<button type="submit">Submit</button>
 </form>
