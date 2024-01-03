@@ -11,12 +11,11 @@ jQuery( document ).ready(
 						url: '/wp-json/contact-plugin/v1/contact',
 						data: data,
 						success: function (response) {
-							// Handle the success response here.
-							console.log( 'AJAX request successful:', response );
+							form.hide();
+							$( '#enquiry_form' ).after( '<p style="color: green">Thank you for your enquiry</p>' );
 						},
 						error: function (xhr, status, error) {
-							// Handle the error here.
-							console.error( 'AJAX request error:', status, error );
+							$( '#enquiry_form' ).after( '<p style="color: red">Sorry, there was a problem with your enquiry</p>' );
 						}
 					}
 				);

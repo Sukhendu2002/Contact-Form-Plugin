@@ -45,8 +45,46 @@ function contact_form_submit( WP_REST_Request $data ): WP_REST_Response {
 		return new WP_REST_Response( 'Message not sent', 403 );
 	}
 
-	unset( $params['enquiry_form_nonce'] );
-	unset( $params['_wp_http_referer'] );
+	// Sanitize and validate user inputs.
+	$name  = sanitize_text_field( $params['name'] );
+	$email = sanitize_email( $params['email'] );
+
+	// Check if required parameters are set.
+	if ( empty( $name ) || empty( $email ) ) {
+		return new WP_REST_Response( 'Invalid input data', 400 );
+	}
+
+	// Remove unnecessary parameters.
+	unset( $params['enquiry_form_nonce'], $params['_wp_http_referer'] );
+
+	// Send the email.
+	$headers     = array();
+	$admin_email = get_bloginfo( 'admin_email' );
+	$admin_name  = get_bloginfo( 'name' );
+
+	$headers[] = "From: {$admin_name} <{$admin_email}>";
+	$headers[] = "Reply-To: {$name} <{$email}>";
+	$headers[] = 'Content-Type: text/html; charset=UTF-8';
+
+	$subject = 'Enquiry from ' . $name;
+
+	$message = "<h1>Massage from {$name}</h1> <br />";
+
+	foreach ( $params as $key => $value ) {
+		$message .= "<strong>{$key}:</strong> {$value} <br />";
+	}
+
+	try {
+		wp_mail( $admin_email, $subject, $message, $headers );
+	} catch ( Exception $e ) {
+		return new WP_REST_Response(
+			array(
+				'message' => $e->getMessage(),
+				'code'    => $e->getCode(),
+			),
+			500
+		);
+	}
 
 	return new WP_REST_Response( 'Message sent', 200 );
 }
