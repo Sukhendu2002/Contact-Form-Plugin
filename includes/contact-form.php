@@ -9,6 +9,40 @@ add_shortcode( 'contact', 'show_contact_form' );
 add_action( 'rest_api_init', 'create_rest_route' );
 add_action( 'init', 'create_submission_page' );
 add_action( 'add_meta_boxes', 'create_meta_box' );
+add_filter( 'manage_submission_posts_columns', 'submission_custom_column' );
+add_action( 'manage_submission_posts_custom_column', 'submission_custom_column_data', 10 );
+
+/**
+ * Function to add data to custom column
+ *
+ * @param string $column Column name.
+ * @return void
+ */
+function submission_custom_column_data( string $column ): void {
+	global $post;
+	$meta = get_post_meta( $post->ID );
+	unset( $meta['_edit_lock'], $meta['_edit_last'] );
+	echo esc_html( $meta[ $column ][0] );
+}
+
+/**
+ * Function to add custom column
+ *
+ * @param array $columns Columns.
+ * @return array
+ */
+function submission_custom_column( array $columns ): array {
+	$columns = array(
+		'cb'      => $columns['cb'],
+		'title'   => __( 'Name', 'contact-plugin' ),
+		'email'   => __( 'Email', 'contact-plugin' ),
+		'phone'   => __( 'Phone', 'contact-plugin' ),
+		'message' => __( 'Message', 'contact-plugin' ),
+		'date'    => __( 'Date', 'contact-plugin' ),
+	);
+
+		return $columns;
+}
 
 /**
  * Function to create meta box
