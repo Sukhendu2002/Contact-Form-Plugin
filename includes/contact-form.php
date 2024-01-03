@@ -8,6 +8,42 @@
 add_shortcode( 'contact', 'show_contact_form' );
 add_action( 'rest_api_init', 'create_rest_route' );
 add_action( 'init', 'create_submission_page' );
+add_action( 'add_meta_boxes', 'create_meta_box' );
+
+/**
+ * Function to create meta box
+ *
+ * @return void
+ */
+function create_meta_box(): void {
+	add_meta_box(
+		'submission_meta_box',
+		'Submission Details',
+		'display_submission',
+		'submission',
+		'normal',
+		'high'
+	);
+}
+
+/**
+ * Function to display submission
+ *
+ * @return void
+ */
+function display_submission(): void {
+	global $post;
+	$meta = get_post_meta( $post->ID );
+	unset( $meta['_edit_lock'], $meta['_edit_last'] );
+	echo '<table>';
+	foreach ( $meta as $key => $value ) {
+		echo '<tr>';
+		echo '<td><strong>' . esc_html( $key ) . ':</strong></td>';
+		echo '<td>' . esc_html( $value[0] ) . '</td>';
+		echo '</tr>';
+	}
+	echo '</table>';
+}
 
 /**
  * Function to create submission page
@@ -16,10 +52,10 @@ add_action( 'init', 'create_submission_page' );
  */
 function create_submission_page(): void {
 	$args = array(
-		'public'      => true,
-		'has_archive' => true,
-		'labels'      => array(
-			'name'               => 'Submissions',
+		'public'          => true,
+		'has_archive'     => true,
+		'labels'          => array(
+			'name'               => 'All Submissions',
 			'singular_name'      => 'Submission',
 			'add_new_item'       => 'Add New Submission',
 			'edit_item'          => 'Edit Submission',
@@ -30,11 +66,13 @@ function create_submission_page(): void {
 			'not_found_in_trash' => 'No submissions found in trash',
 			'menu_name'          => 'Submissions',
 		),
-		'menu_icon'   => 'dashicons-media-spreadsheet',
-		'supports'    => array( 'custom-fields' ),
-	// 'capabilities' => array(
-	// 'create_posts' => 'do_not_allow',
-	// ),
+		'menu_icon'       => 'dashicons-media-spreadsheet',
+		'supports'        => false,
+		'capability_type' => 'post',
+		'capabilities'    => array(
+			'create_posts' => false,
+		),
+		'map_meta_cap'    => true,
 	);
 
 	register_post_type( 'submission', $args );
@@ -108,6 +146,7 @@ function contact_form_submit( WP_REST_Request $data ): WP_REST_Response {
 		'post_title'   => $subject,
 		'post_content' => $message,
 		'post_type'    => 'submission',
+		'post_status'  => 'publish',
 	);
 	$post_id = wp_insert_post( $postarr );
 
