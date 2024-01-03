@@ -7,6 +7,39 @@
 
 add_shortcode( 'contact', 'show_contact_form' );
 add_action( 'rest_api_init', 'create_rest_route' );
+add_action( 'init', 'create_submission_page' );
+
+/**
+ * Function to create submission page
+ *
+ * @return void
+ */
+function create_submission_page(): void {
+	$args = array(
+		'public'      => true,
+		'has_archive' => true,
+		'labels'      => array(
+			'name'               => 'Submissions',
+			'singular_name'      => 'Submission',
+			'add_new_item'       => 'Add New Submission',
+			'edit_item'          => 'Edit Submission',
+			'all_items'          => 'All Submissions',
+			'view_item'          => 'View Submission',
+			'search_items'       => 'Search Submissions',
+			'not_found'          => 'No submissions found',
+			'not_found_in_trash' => 'No submissions found in trash',
+			'menu_name'          => 'Submissions',
+		),
+		'menu_icon'   => 'dashicons-media-spreadsheet',
+		'supports'    => array( 'custom-fields' ),
+	// 'capabilities' => array(
+	// 'create_posts' => 'do_not_allow',
+	// ),
+	);
+
+	register_post_type( 'submission', $args );
+}
+
 /**
  * Function to show contact form
  *
@@ -70,8 +103,17 @@ function contact_form_submit( WP_REST_Request $data ): WP_REST_Response {
 
 	$message = "<h1>Massage from {$name}</h1> <br />";
 
+	// Create post of type submission.
+	$postarr = array(
+		'post_title'   => $subject,
+		'post_content' => $message,
+		'post_type'    => 'submission',
+	);
+	$post_id = wp_insert_post( $postarr );
+
 	foreach ( $params as $key => $value ) {
 		$message .= "<strong>{$key}:</strong> {$value} <br />";
+		add_post_meta( $post_id, $key, $value );
 	}
 
 	try {
