@@ -17,6 +17,7 @@ add_action( 'carbon_fields_register_fields', 'create_option_page' );
 function create_option_page(): void
 {
 	Container::make( 'theme_options', __( 'Contact Form' ) )
+		->set_page_menu_position( 30 )
 		->set_icon( 'dashicons-media-text' )
 		->add_fields(
 			array(

@@ -130,9 +130,9 @@ function display_submission(): void {
  */
 function create_submission_page(): void {
 	$args = array(
-		'public'          => true,
-		'has_archive'     => true,
-		'labels'          => array(
+		'public'             => true,
+		'has_archive'        => true,
+		'labels'             => array(
 			'name'               => 'All Submissions',
 			'singular_name'      => 'Submission',
 			'add_new_item'       => 'Add New Submission',
@@ -144,13 +144,15 @@ function create_submission_page(): void {
 			'not_found_in_trash' => 'No submissions found in trash',
 			'menu_name'          => 'Submissions',
 		),
-		'menu_icon'       => 'dashicons-media-spreadsheet',
-		'supports'        => false,
-		'capability_type' => 'post',
-		'capabilities'    => array(
+		'menu_icon'          => 'dashicons-media-spreadsheet',
+		'menu_position'      => 30,
+		'publicly_queryable' => false,
+		'supports'           => false,
+		'capability_type'    => 'post',
+		'capabilities'       => array(
 			'create_posts' => false,
 		),
-		'map_meta_cap'    => true,
+		'map_meta_cap'       => true,
 	);
 
 	register_post_type( 'submission', $args );
@@ -195,9 +197,9 @@ function contact_form_submit( WP_REST_Request $data ): WP_REST_Response {
 	}
 
 	// Sanitize and validate user inputs.
-	$name  = sanitize_text_field( $params['name'] );
-	$email = sanitize_email( $params['email'] );
-	$phone = sanitize_text_field( $params['phone'] );
+	$name    = sanitize_text_field( $params['name'] );
+	$email   = sanitize_email( $params['email'] );
+	$phone   = sanitize_text_field( $params['phone'] );
 	$message = sanitize_textarea_field( $params['message'] );
 
 	// Check if required parameters are set.
