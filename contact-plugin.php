@@ -9,7 +9,7 @@
  * Plugin Name: Contact Plugin
  * Plugin URI: https://github.com/Sukhendu2002/Contact-Form-Plugin
  * Description: Plugin to add a contact form to your website and save the data in the database.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Text Domain: contact-plugin
  *  Requires at least: 5.2
  *  Requires PHP: 7.2
