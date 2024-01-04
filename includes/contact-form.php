@@ -11,6 +11,50 @@ add_action( 'init', 'create_submission_page' );
 add_action( 'add_meta_boxes', 'create_meta_box' );
 add_filter( 'manage_submission_posts_columns', 'submission_custom_column' );
 add_action( 'manage_submission_posts_custom_column', 'submission_custom_column_data', 10 );
+add_action( 'admin_init', 'setup_search' );
+
+/**
+ * Function to set up search
+ *
+ * @return void
+ */
+function setup_search(): void {
+	global $typenow;
+
+	if ( 'submission' === $typenow ) {
+		add_filter( 'posts_search', 'submission_search_override', 10, 2 );
+	}
+}
+
+/**
+ * Function to override search
+ *
+ * @param string         $search Search string.
+ * @param WP_Query|mixed $query Query.
+ * @return string
+ */
+function submission_search_override( $search, $query ) {
+
+	global $wpdb;
+
+	if ( $query->is_main_query() && ! empty( $query->query['s'] ) ) {
+		$sql    = "
+              or exists (
+                  select * from {$wpdb->postmeta} where post_id={$wpdb->posts}.ID
+                  and meta_key in ('name','email','phone')
+                  and meta_value like %s
+              )
+          ";
+		$like   = '%' . $wpdb->esc_like( $query->query['s'] ) . '%';
+		$search = preg_replace(
+			"#\({$wpdb->posts}.post_title LIKE [^)]+\)\K#",
+			$wpdb->prepare( $sql, $like ),
+			$search
+		);
+	}
+
+	return $search;
+}
 
 /**
  * Function to add data to custom column
