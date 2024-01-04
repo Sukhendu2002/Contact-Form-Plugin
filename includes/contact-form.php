@@ -2,7 +2,7 @@
 /**
  * Shortcode for contact form
  *
- * @package ContactPlugin
+ * @package contact-plugin
  */
 
 add_shortcode( 'contact', 'show_contact_form' );
@@ -31,26 +31,35 @@ function setup_search(): void {
  *
  * @param string         $search Search string.
  * @param WP_Query|mixed $query Query.
+ *
  * @return string
  */
-function submission_search_override( $search, $query ) {
+function submission_search_override( string $search, mixed $query ): string {
 
 	global $wpdb;
 
 	if ( $query->is_main_query() && ! empty( $query->query['s'] ) ) {
-		$sql    = "
-              or exists (
-                  select * from {$wpdb->postmeta} where post_id={$wpdb->posts}.ID
-                  and meta_key in ('name','email','phone')
-                  and meta_value like %s
-              )
-          ";
-		$like   = '%' . $wpdb->esc_like( $query->query['s'] ) . '%';
+
+		$like = '%' . $wpdb->esc_like( $query->query['s'] ) . '%';
+
+		$sql = $wpdb->prepare(
+			"
+	      OR EXISTS (
+	        SELECT * FROM {$wpdb->postmeta} 
+	        WHERE post_id={$wpdb->posts}.ID
+	        AND meta_key IN ('name','email','phone')
+	        AND meta_value LIKE %s
+	      )
+    ",
+			$like
+		);
+
 		$search = preg_replace(
-			"#\({$wpdb->posts}.post_title LIKE [^)]+\)\K#",
-			$wpdb->prepare( $sql, $like ),
+			"#({$wpdb->posts}.post_title LIKE [^)]+)\K#",
+			$sql,
 			$search
 		);
+
 	}
 
 	return $search;
@@ -76,7 +85,7 @@ function submission_custom_column_data( string $column ): void {
  * @return array
  */
 function submission_custom_column( array $columns ): array {
-	$columns = array(
+	return array(
 		'cb'      => $columns['cb'],
 		'title'   => __( 'Name', 'contact-plugin' ),
 		'email'   => __( 'Email', 'contact-plugin' ),
@@ -84,8 +93,6 @@ function submission_custom_column( array $columns ): array {
 		'message' => __( 'Message', 'contact-plugin' ),
 		'date'    => __( 'Date', 'contact-plugin' ),
 	);
-
-		return $columns;
 }
 
 /**
@@ -136,7 +143,7 @@ function create_submission_page(): void {
 			'name'               => 'All Submissions',
 			'singular_name'      => 'Submission',
 			'add_new_item'       => 'Add New Submission',
-			'edit_item'          => 'Edit Submission',
+			'edit_item'          => 'View Submission',
 			'all_items'          => 'All Submissions',
 			'view_item'          => 'View Submission',
 			'search_items'       => 'Search Submissions',
@@ -215,6 +222,12 @@ function contact_form_submit( WP_REST_Request $data ): WP_REST_Response {
 	$admin_email = get_bloginfo( 'admin_email' );
 	$admin_name  = get_bloginfo( 'name' );
 
+	// Set the recipient email.
+	$recipient_email = get_plugin_option( 'contact_plugin_recipient' );
+	if ( empty( $recipient_email ) ) {
+		$recipient_email = $admin_email;
+	}
+
 	$headers[] = "From: {$admin_name} <{$admin_email}>";
 	$headers[] = "Reply-To: {$name} <{$email}>";
 	$headers[] = 'Content-Type: text/html; charset=UTF-8';
@@ -243,7 +256,8 @@ function contact_form_submit( WP_REST_Request $data ): WP_REST_Response {
 	}
 
 	try {
-		wp_mail( $admin_email, $subject, $message, $headers );
+		wp_mail( $recipient_email, $subject, $message, $headers );
+
 	} catch ( Exception $e ) {
 		return new WP_REST_Response(
 			array(
@@ -253,6 +267,11 @@ function contact_form_submit( WP_REST_Request $data ): WP_REST_Response {
 			500
 		);
 	}
+	$conformation_message = 'The message has been sent successfully.';
+	if ( get_plugin_option( 'contact_plugin_message' ) ) {
+		$conformation_message = get_plugin_option( 'contact_plugin_message' );
+		$conformation_message = str_replace( '{name}', $name, get_plugin_option( 'contact_plugin_message' ) );
 
-	return new WP_REST_Response( 'Message sent', 200 );
+	}
+	return new WP_REST_Response( $conformation_message, 200 );
 }

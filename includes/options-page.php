@@ -2,7 +2,7 @@
 /**
  * Option page for the plugin
  *
- * @package ContactPlugin
+ * @package contact-plugin
  */
 
 use Carbon_Fields\Container;
@@ -14,8 +14,7 @@ add_action( 'carbon_fields_register_fields', 'create_option_page' );
 /**
  * Create the option page
  */
-function create_option_page(): void
-{
+function create_option_page(): void {
 	Container::make( 'theme_options', __( 'Contact Form' ) )
 		->set_page_menu_position( 30 )
 		->set_icon( 'dashicons-media-text' )
@@ -39,7 +38,6 @@ function create_option_page(): void
 /**
  * Load Carbon Fields
  */
-function load_carbon_fields(): void
-{
+function load_carbon_fields(): void {
 	\Carbon_Fields\Carbon_Fields::boot();
 }

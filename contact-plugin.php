@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Contact Plugin
  *
- * @package ContactPlugin
+ * @package contact-plugin
  */
 
 /**

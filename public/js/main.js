@@ -1,3 +1,9 @@
+/**
+ * Handle the form submission
+ *
+ * @package contact-plugin
+ */
+
 jQuery( document ).ready(
 	function ($) {
 		$( '#enquiry_form' ).submit(
@@ -12,7 +18,11 @@ jQuery( document ).ready(
 						data: data,
 						success: function (response) {
 							form.hide();
-							$( '#enquiry_form' ).after( '<p style="color: green">Thank you for your enquiry</p>' );
+							$( '#enquiry_form' ).after(
+								'<p style="color: green">' +
+								'' + response +
+								'</p>'
+							);
 						},
 						error: function (xhr, status, error) {
 							$( '#enquiry_form' ).after( '<p style="color: red">Sorry, there was a problem with your enquiry</p>' );

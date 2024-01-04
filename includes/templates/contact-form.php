@@ -2,10 +2,12 @@
 /**
  * Form Template
  *
- * @package ContactPlugin
+ * @package contact-plugin
  */
 
 ?>
+
+<?php if ( get_plugin_option( 'contact_plugin_active' ) ) : ?>
 <form id="enquiry_form" method="post">
 	<h2>Contact Form</h2>
 	<?php wp_nonce_field( 'enquiry_form', 'enquiry_form_nonce' ); ?>
@@ -35,3 +37,6 @@
 
 	<button type="submit">Submit</button>
 </form>
+<?php else : ?>
+	<p>Contact plugin is not active</p>
+<?php endif; ?>

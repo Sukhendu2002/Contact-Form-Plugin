@@ -2,7 +2,7 @@
 /**
  * Enqueue scripts and styles
  *
- * @package ContactPlugin
+ * @package contact-plugin
  */
 
 add_action( 'wp_enqueue_scripts', 'contact_enqueue_script' );
