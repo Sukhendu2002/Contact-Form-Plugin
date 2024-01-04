@@ -197,6 +197,8 @@ function contact_form_submit( WP_REST_Request $data ): WP_REST_Response {
 	// Sanitize and validate user inputs.
 	$name  = sanitize_text_field( $params['name'] );
 	$email = sanitize_email( $params['email'] );
+	$phone = sanitize_text_field( $params['phone'] );
+	$message = sanitize_textarea_field( $params['message'] );
 
 	// Check if required parameters are set.
 	if ( empty( $name ) || empty( $email ) ) {
@@ -229,8 +231,13 @@ function contact_form_submit( WP_REST_Request $data ): WP_REST_Response {
 	$post_id = wp_insert_post( $postarr );
 
 	foreach ( $params as $key => $value ) {
-		$message .= "<strong>{$key}:</strong> {$value} <br />";
+		$value = match ( $key ) {
+			'message' => sanitize_textarea_field( $value ),
+			default => sanitize_text_field( $value ),
+		};
+
 		add_post_meta( $post_id, $key, $value );
+		$message .= "<strong>{$key}:</strong> {$value} <br />";
 	}
 
 	try {
