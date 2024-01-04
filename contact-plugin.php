@@ -7,9 +7,16 @@
 
 /**
  * Plugin Name: Contact Plugin
- * Description: A plugin to create contact forms.
+ * Plugin URI: https://github.com/Sukhendu2002/Contact-Form-Plugin
+ * Description: Plugin to add a contact form to your website and save the data in the database.
  * Version: 1.0.0
  * Text Domain: contact-plugin
+ *  Requires at least: 5.2
+ *  Requires PHP: 7.2
+ *  Author: Sukhendu Sekhar Guria
+ *  Author URI: https://github.com/Sukhendu2002
+ *  License: GPL v2 or later
+ *  License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
